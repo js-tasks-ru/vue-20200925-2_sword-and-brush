@@ -44,23 +44,52 @@ const agendaItemIcons = {
   other: 'cal-sm',
 };
 
+
 export const app = new Vue({
   el: '#app',
 
   data: {
-    //
+    rawMeetup: null,
+    agendaItemIconsTHIS: agendaItemIcons,
   },
 
   mounted() {
     // Требуется получить данные митапа с API
+    this.fetchMeetup();
   },
 
   computed: {
-    //
+    reformedMeetup() {
+      if (this.rawMeetup !== null) {
+        return {
+          ...this.rawMeetup,
+          date: new Date(this.rawMeetup.date),
+          localDate: new Date(this.rawMeetup.date).toLocaleString(navigator.language, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }),
+          ISODate: new Date(this.rawMeetup.date).toISOString().substr(0, 10),
+          agenda: this.rawMeetup.agenda.map((meetup) => ({
+            ...meetup,
+            image: `/assets/icons/icon-${agendaItemIcons[meetup.type]}.svg`,
+
+            title: (meetup.title === null) ? `${agendaItemTitles[meetup.type]}` : meetup.title,
+          })),
+          image: getMeetupCoverLink(this.rawMeetup),
+        };
+      } else {
+        return null;
+      }
+    },
   },
 
   methods: {
     // Получение данных с API предпочтительнее оформить отдельным методом,
     // а не писать прямо в mounted()
+    async fetchMeetup() {
+      this.rawMeetup = await fetch(`${API_URL}/meetups/${MEETUP_ID}`).then(response => response.json());
+      // console.log(this.rawMeetup);
+    },
   },
 });
