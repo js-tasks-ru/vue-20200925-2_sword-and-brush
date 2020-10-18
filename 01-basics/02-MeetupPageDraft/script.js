@@ -75,7 +75,8 @@ export const app = new Vue({
             icon: `/assets/icons/icon-${agendaItemIcons[meetup.type]}.svg`,
             title: (meetup.title === null) ? `${agendaItemTitles[meetup.type]}` : meetup.title,
           })),
-          image: getMeetupCoverLink(this.rawMeetup),
+          image: this.rawMeetup.imageId ? { '--bg-url': `url(${getMeetupCoverLink(this.rawMeetup)})` }
+            : '',
         };
       } else {
         return null;
