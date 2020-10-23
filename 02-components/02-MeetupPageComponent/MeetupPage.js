@@ -5,8 +5,8 @@ export const MeetupPage = {
   name: 'MeetupPage',
 
   template: `
-    <div v-if="rawMeetup">
-    <meetup-view :meetup="rawMeetup"></meetup-view>
+    <div>
+    <meetup-view v-if="rawMeetup" :meetup="rawMeetup"></meetup-view>
     </div>`,
 
   components: {
