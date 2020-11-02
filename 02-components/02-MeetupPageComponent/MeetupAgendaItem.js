@@ -30,7 +30,6 @@ export const MeetupAgendaItem = {
   computed: {
     agendaItemComputed() {
       return {
-        ...this.agendaItem,
         icon: `/assets/icons/icon-${agendaItemIcons[this.agendaItem.type]}.svg`,
         title: (this.agendaItem.title === null) ? `${agendaItemTitles[this.agendaItem.type]}` : this.agendaItem.title,
       };
