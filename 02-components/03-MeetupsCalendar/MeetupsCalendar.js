@@ -22,9 +22,9 @@ export const MeetupsCalendar = {
         <div v-for="day in currentMonthList"
              :class="{'rangepicker__cell': true, 'rangepicker__cell_inactive': day.currentMonth === false }">
           {{ day.currentDate }}
-          <div v-if="day.haveMeetup !== null">
-            <a v-for="meetupTitle in day.haveMeetup" class="rangepicker__event">{{ meetupTitle }}</a>
-          </div>
+            <div v-if="meetupsDays[day.haveMeetup]">
+              <a v-for="meetup in meetupsDays[day.haveMeetup]" class="rangepicker__event">{{ meetup }}</a>
+            </div>
         </div>
       </div>
     </div>
@@ -81,27 +81,26 @@ export const MeetupsCalendar = {
         if (matchingFirstDay) break;
         if (matchingLastDay) break;
 
-        let haveMeetup = null;
-        for (let meetup of this.meetupsDays) {
-          if (getDateOnlyString(new Date(meetup.date)) === getDateOnlyString(new Date(currentDay))) {
-            haveMeetup = meetup.title;
-          }
-        }
-
         currentMonth.push({
           currentDate: new Date(currentDay).getDate(),
           currentMonth: new Date(this.currentDate).getMonth() === new Date(currentDay).getMonth(),
-          haveMeetup: haveMeetup,
+          haveMeetup: new Date(currentDay).toDateString(),
         });
       }
       return currentMonth;
     },
 
     meetupsDays() {
-      return this.meetups.map((meetup) => ({
-        date: meetup.date,
-        title: this.meetups.filter((title) => meetup.date === title.date).map((targetMeetup) => targetMeetup.title),
-      }));
+      const result = {};
+      this.meetups.forEach((meetup) => {
+        const dateString = new Date(meetup.date).toDateString();
+        if (!result[dateString]) {
+          result[dateString] = [meetup.title];
+        } else {
+          result[dateString].push(meetup.title);
+        }
+      });
+      return result;
     },
   },
 
