@@ -2,16 +2,16 @@
   <div @click="state = !state" class="dropdown" :class="{ show: state }">
     <button type="button" class="button dropdown__toggle" :class="{ 'dropdown__toggle_icon': hasIcon }">
       <template v-if="value">
-        <app-icon v-if="hasIcon" :icon="iconsArray[value]" />
-        {{ title }} {{ `- ${eventsList[value]}` }}
+        <app-icon v-if="hasIcon" :icon="selectedValue.icon" />
+        {{ title }} {{ `- ${selectedValue.text}` }}
       </template>
-      <template v-else>{{ title }} {{ value }}</template>
+      <template v-else>{{ title }}</template>
     </button>
 
     <div class="dropdown__menu" :class="{ show: state }">
       <button @click="change(item)" v-for="item in options" class="dropdown__item"
               :class="{ 'dropdown__item_icon': hasIcon }" type="button">
-        <app-icon v-if="hasIcon" :icon="item.icon" />
+        <app-icon v-if="item.icon" :icon="item.icon" />
         {{ item.text }}
       </button>
     </div>
@@ -55,7 +55,6 @@ export default {
   methods: {
     change(item) {
       this.$emit('change', item.value);
-      this.state = 'close';
     },
   },
 
@@ -64,22 +63,8 @@ export default {
       return this.options.some((item) => item.icon);
     },
 
-    eventsList() {
-      let events = {};
-      this.options.forEach((item) => {
-        events[item.value] = item.text;
-      });
-      return events;
-    },
-
-    iconsArray() {
-      let icons = {};
-      if (this.hasIcon) {
-        this.options.forEach((item) => {
-          icons[item.value] = item.icon;
-        });
-      }
-      return icons;
+    selectedValue() {
+      return this.options.find((option) => option.value === this.value);
     },
   },
 };
