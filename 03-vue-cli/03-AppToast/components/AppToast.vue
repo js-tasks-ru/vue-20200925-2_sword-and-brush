@@ -1,12 +1,9 @@
 <template>
   <div class="toasts">
     <div v-for="toast in toastList">
-      <div v-if="toast.value === 'success'" class="toast toast_success">
-        <app-icon icon="check-circle" />
-        <span>{{ toast.message }}</span>
-      </div>
-      <div v-if="toast.value === 'error'" class="toast toast_error">
-        <app-icon icon="alert-circle" />
+      <div class="toast"
+           :class="{'toast_success': toast.value === 'success', 'toast_error': toast.value === 'error'}">
+        <app-icon :icon="toast.icon" />
         <span>{{ toast.message }}</span>
       </div>
     </div>
@@ -31,14 +28,15 @@ export default {
 
   methods: {
     error(message) {
-      this.toastList.push({ value: 'error', message: message });
-      setTimeout(() => {
-        this.toastList.shift();
-      }, DELAY);
+      this.addToast({ value: 'error', message: message, icon: 'alert-circle' });
     },
 
     success(message) {
-      this.toastList.push({ value: 'success', message: message });
+      this.addToast({ value: 'success', message: message, icon: 'check-circle' });
+    },
+
+    addToast(toast) {
+      this.toastList.push(toast);
       setTimeout(() => {
         this.toastList.shift();
       }, DELAY);
