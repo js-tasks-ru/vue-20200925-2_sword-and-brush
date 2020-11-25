@@ -22,9 +22,7 @@ export const MeetupsCalendar = {
         <div v-for="day in currentMonthList"
              :class="{'rangepicker__cell': true, 'rangepicker__cell_inactive': day.currentMonth === false }">
           {{ day.currentDate }}
-            <div v-if="meetupsDays[day.haveMeetup]">
-              <a v-for="meetup in meetupsDays[day.haveMeetup]" class="rangepicker__event">{{ meetup }}</a>
-            </div>
+              <a v-for="meetup in meetupsDays[day.dateToString]" class="rangepicker__event">{{ meetup }}</a>
         </div>
       </div>
     </div>
@@ -84,7 +82,7 @@ export const MeetupsCalendar = {
         currentMonth.push({
           currentDate: new Date(currentDay).getDate(),
           currentMonth: new Date(this.currentDate).getMonth() === new Date(currentDay).getMonth(),
-          haveMeetup: new Date(currentDay).toDateString(),
+          dateToString: new Date(currentDay).toDateString(),
         });
       }
       return currentMonth;
