@@ -43,11 +43,11 @@ export default {
   },
 
   watch: {
-    getQueryParam() {
-      this.params.view = this.getQueryParam.view;
-      this.params.date = this.getQueryParam.date;
-      this.params.participation = this.getQueryParam.participation;
-      this.params.search = this.getQueryParam.search;
+    queryParam() {
+      this.params.view = this.queryParam.view;
+      this.params.date = this.queryParam.date;
+      this.params.participation = this.queryParam.participation;
+      this.params.search = this.queryParam.search;
     },
     params: {
       handler() {
@@ -63,7 +63,7 @@ export default {
     },
   },
   computed: {
-    getQueryParam() {
+    queryParam() {
       return this.$route.query;
     },
   },
