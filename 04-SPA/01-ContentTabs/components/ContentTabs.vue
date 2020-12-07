@@ -1,10 +1,13 @@
 <template>
   <div class="content-tabs">
     <div class="content-tabs__nav">
-      <router-link v-for="tab in tabs" :to="tab.to" :active-class="'content-tabs__tab_active'"
-                   class="content-tabs__tab">{{ tab.text }}</router-link>
+      <router-link v-for="tab in tabs" :to="tab.to" active-class="content-tabs__tab_active"
+                   class="content-tabs__tab">{{ tab.text }}
+      </router-link>
     </div>
-    <div class="content-tabs__content"><slot></slot></div>
+    <div class="content-tabs__content">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
