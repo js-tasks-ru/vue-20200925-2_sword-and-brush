@@ -1,4 +1,4 @@
-<template v-slot:footer>
+<template>
   <div class="footer">
     <div class="container">
       © 2020. learn.javascript.ru <a href="https://learn.javascript.ru/courses/vue">Vue.js Course</a>
