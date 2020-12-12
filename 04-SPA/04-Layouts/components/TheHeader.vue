@@ -1,4 +1,4 @@
-<template v-slot:header>
+<template>
   <div class="header">
     <div>
       <h1>
