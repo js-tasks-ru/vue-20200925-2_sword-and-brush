@@ -15,8 +15,8 @@ export default {
 
   data() {
     return {
-      hasLeftIcon: null,
-      hasRightIcon: null,
+      hasLeftIcon: false,
+      hasRightIcon: false,
     };
   },
 
@@ -28,7 +28,7 @@ export default {
   },
 
   model: {
-    props: 'value',
+    prop: 'value',
     event: 'input',
   },
 
