@@ -31,8 +31,7 @@
             type="time"
             placeholder="00:00"
             v-model="localAgendaItem.startsAt"
-            @click="oldStartAt = $event.target.value"
-            @change="changeAgendaStartsAt($event.target.value)"
+            @change="changeAgendaItem"
           />
         </div>
       </div>
@@ -123,37 +122,17 @@ export default {
 
   data() {
     return {
-      localAgendaItem: this.agendaItem,
+      localAgendaItem: { ...this.agendaItem },
       talkLanguages: getTalkLanguages(),
       agendaItemTypesRaw: getAgendaItemTypes(),
       selectedAgendaType: 'other',
       selectedLanguageType: null,
-      oldStartAt: '',
     };
   },
 
   methods: {
     changeAgendaItem() {
       this.$emit('update:agendaItem', this.localAgendaItem);
-    },
-    changeAgendaStartsAt(newValue) {
-      let oldStartAtMinutes = this.oldStartAt.split(':').reduce((acc, value) => +acc * 60 + +value);
-      let newStartAtMinutes = newValue.split(':').reduce((acc, value) => +acc * 60 + +value);
-      let oldEndsMinutes = this.localAgendaItem.endsAt.split(':').reduce((acc, value) => +acc * 60 + +value);
-      let newEndsAtMinutes = (oldEndsMinutes + (newStartAtMinutes - oldStartAtMinutes) + 24 * 60) % (24 * 60);
-
-      let hours = (newEndsAtMinutes / 60).toFixed(0);
-      let minutes = newEndsAtMinutes % 60;
-
-      if (hours < 10) {
-        hours = '0' + hours;
-      }
-      if (minutes < 10) {
-        minutes = '0' + minutes;
-      }
-
-      this.localAgendaItem.endsAt = `${hours}:${minutes}`;
-      this.changeAgendaItem();
     },
     changeAgendaType(value) {
       this.selectedAgendaType = value;
@@ -173,6 +152,29 @@ export default {
         ...item,
         id: idxGen(),
       }));
+    },
+    startAt() {
+      return this.localAgendaItem.startsAt;
+    },
+  },
+  watch: {
+    startAt(newValue, oldValue) {
+      let oldStartAtMinutes = oldValue.split(':').reduce((acc, value) => +acc * 60 + +value);
+      let newStartAtMinutes = newValue.split(':').reduce((acc, value) => +acc * 60 + +value);
+      let oldEndsMinutes = this.localAgendaItem.endsAt.split(':').reduce((acc, value) => +acc * 60 + +value);
+      let newEndsAtMinutes = (oldEndsMinutes + (newStartAtMinutes - oldStartAtMinutes) + 24 * 60) % (24 * 60);
+
+      let hours = (newEndsAtMinutes / 60).toFixed(0);
+      let minutes = newEndsAtMinutes % 60;
+
+      if (hours < 10) {
+        hours = '0' + hours;
+      }
+      if (minutes < 10) {
+        minutes = '0' + minutes;
+      }
+
+      this.localAgendaItem.endsAt = `${hours}:${minutes}`;
     },
   },
 };
