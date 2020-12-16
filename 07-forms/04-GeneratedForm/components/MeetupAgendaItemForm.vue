@@ -20,8 +20,7 @@
             type="time"
             placeholder="00:00"
             v-model="localAgenda.startsAt"
-            @click="oldStartAt = $event.target.value"
-            @change="changeAgendaStartsAt($event)"
+            @change="changeAgendaItem"
           />
         </div>
       </div>
@@ -72,9 +71,8 @@ export default {
 
   data() {
     return {
-      localAgenda: this.agendaItem,
+      localAgenda: { ...this.agendaItem },
       selectedAgenda: getAgendaItemsFieldSpecifications(),
-      oldStartAt: this.agendaItem.startsAt,
     };
   },
 
@@ -89,9 +87,17 @@ export default {
     changeAgendaItem() {
       this.$emit('update:agendaItem', this.localAgenda);
     },
+  },
 
-    changeAgendaStartsAt(newValue) {
-      let oldStartAtMinutes = this.oldStartAt.split(':').reduce((acc, value) => +acc * 60 + +value);
+  computed: {
+    startAt() {
+      return this.localAgenda.startsAt;
+    },
+  },
+
+  watch: {
+    startAt(newValue, oldValue) {
+      let oldStartAtMinutes = oldValue.split(':').reduce((acc, value) => +acc * 60 + +value);
       let newStartAtMinutes = newValue.split(':').reduce((acc, value) => +acc * 60 + +value);
       let oldEndsMinutes = this.localAgenda.endsAt.split(':').reduce((acc, value) => +acc * 60 + +value);
       let newEndsAtMinutes = (oldEndsMinutes + (newStartAtMinutes - oldStartAtMinutes) + 24 * 60) % (24 * 60);
@@ -105,9 +111,7 @@ export default {
       if (minutes < 10) {
         minutes = '0' + minutes;
       }
-
       this.localAgenda.endsAt = `${hours}:${minutes}`;
-      this.changeAgendaItem();
     },
   },
 };
