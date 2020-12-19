@@ -9,13 +9,13 @@
         class="form-control"
         title="Тип"
         v-model="localAgendaItem.type"
-        @change="changeAgendaType($event.target.value)"
+        @change="changeAgendaItem"
       >
         <option
           v-for="agendaType in agendaItemTypes"
           :key="agendaType.id"
           :value="agendaType.value"
-          :selected="agendaType.value === 'other'"
+          :selected="agendaType.value"
         >
           {{ agendaType.text }}
         </option>
@@ -50,18 +50,18 @@
     </div>
 
     <div class="form-group">
-      <label v-if="selectedAgendaType === 'other'" class="form-label">Заголовок</label>
-      <label v-else-if="selectedAgendaType === 'talk'" class="form-label">Тема</label>
+      <label v-if="localAgendaItem.type === 'other'" class="form-label">Заголовок</label>
+      <label v-else-if="localAgendaItem.type === 'talk'" class="form-label">Тема</label>
       <label v-else class="form-label">Нестандартный текст (необязательно)</label>
       <input class="form-control" v-model="localAgendaItem.title" @change="changeAgendaItem" />
     </div>
 
-    <div v-if="selectedAgendaType === 'talk'" class="form-group">
+    <div v-if="localAgendaItem.type === 'talk'" class="form-group">
       <label class="form-label">Докладчик</label>
       <input class="form-control" v-model="localAgendaItem.speaker" @change="changeAgendaItem" />
     </div>
 
-    <div v-if="!!(selectedAgendaType === 'talk' || selectedAgendaType === 'other')" class="form-group">
+    <div v-if="!!(localAgendaItem.type === 'talk' || localAgendaItem.type === 'other')" class="form-group">
       <label class="form-label">Описание</label>
       <textarea
         class="form-control"
@@ -70,7 +70,7 @@
       ></textarea>
     </div>
 
-    <div v-if="selectedAgendaType === 'talk'" class="form-group">
+    <div v-if="localAgendaItem.type === 'talk'" class="form-group">
       <label class="form-label">Язык</label>
       <select
         class="form-control"
@@ -81,7 +81,7 @@
           v-for="languagesType in languages"
           :key="languagesType.id"
           :value="languagesType.value"
-          :selected="languagesType.value === null">
+          :selected="localAgendaItem.language">
           {{ languagesType.text }}
         </option>
       </select>
@@ -125,18 +125,12 @@ export default {
       localAgendaItem: { ...this.agendaItem },
       talkLanguages: getTalkLanguages(),
       agendaItemTypesRaw: getAgendaItemTypes(),
-      selectedAgendaType: 'other',
-      selectedLanguageType: null,
     };
   },
 
   methods: {
     changeAgendaItem() {
-      this.$emit('update:agendaItem', this.localAgendaItem);
-    },
-    changeAgendaType(value) {
-      this.selectedAgendaType = value;
-      this.changeAgendaItem();
+      this.$emit('update:agendaItem', { ...this.localAgendaItem });
     },
   },
 
@@ -173,7 +167,6 @@ export default {
       if (minutes < 10) {
         minutes = '0' + minutes;
       }
-
       this.localAgendaItem.endsAt = `${hours}:${minutes}`;
     },
   },
