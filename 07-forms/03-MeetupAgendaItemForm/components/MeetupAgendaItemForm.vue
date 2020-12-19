@@ -15,7 +15,6 @@
           v-for="agendaType in agendaItemTypes"
           :key="agendaType.id"
           :value="agendaType.value"
-          :selected="agendaType.value"
         >
           {{ agendaType.text }}
         </option>
@@ -81,7 +80,7 @@
           v-for="languagesType in languages"
           :key="languagesType.id"
           :value="languagesType.value"
-          :selected="localAgendaItem.language">
+        >
           {{ languagesType.text }}
         </option>
       </select>
