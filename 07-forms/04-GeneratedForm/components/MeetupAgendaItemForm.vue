@@ -36,13 +36,12 @@
       </div>
     </div>
 
-    <div v-for="agendaField in selectedAgenda[localAgenda.type]"
+    <div v-for="agendaField in $options.fieldSpecifications[localAgenda.type]"
          :key="agendaField.field"
          class="form-group">
       <label class="form-label">{{ agendaField.title }}</label>
       <component
-        :options="agendaField.props.options"
-        :multiline="agendaField.props.multiline"
+        v-bind="agendaField.props"
         :is="agendaField.component"
         v-model="localAgenda[agendaField.field]"
         @change="changeAgendaItem"
@@ -72,7 +71,6 @@ export default {
   data() {
     return {
       localAgenda: { ...this.agendaItem },
-      selectedAgenda: getAgendaItemsFieldSpecifications(),
     };
   },
 
@@ -85,7 +83,7 @@ export default {
 
   methods: {
     changeAgendaItem() {
-      this.$emit('update:agendaItem', this.localAgenda);
+      this.$emit('update:agendaItem', { ...this.localAgenda });
     },
   },
 
