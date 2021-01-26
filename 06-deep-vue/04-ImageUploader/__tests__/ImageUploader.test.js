@@ -1,3 +1,5 @@
+import flushPromises from 'flush-promises';
+
 const { shallowMount } = require('@vue/test-utils');
 const { getSolutionPath } = require('taskbook-test-utils');
 const { ImageService } = require(getSolutionPath('image-service'));
@@ -55,8 +57,9 @@ describe('deep-vue/ImageUploader', () => {
       expect(label.text()).toBe('Загрузка...');
       expect(input.element.disabled).toBe(true);
 
-      jest.runAllTimers();
+      await flushPromises();
       await wrapper.vm.$nextTick();
+
       expect(label.text()).not.toBe('Загрузка...');
       expect(input.element.disabled).toBe(false);
     });
@@ -66,7 +69,8 @@ describe('deep-vue/ImageUploader', () => {
       getFiles.mockReturnValue([new File([], 'image.png')]);
 
       await input.trigger('change');
-      jest.runAllTimers();
+      await flushPromises();
+      await wrapper.vm.$nextTick();
       expect(wrapper.emitted().change).toHaveLength(1);
       expect(wrapper.emitted().change[0]).toEqual([mockID]);
     });
@@ -76,15 +80,13 @@ describe('deep-vue/ImageUploader', () => {
       getFiles.mockReturnValue([new File([], 'image.png')]);
 
       await input.trigger('change');
-      jest.runAllTimers();
+      await flushPromises();
+      await wrapper.vm.$nextTick();
       expect(ImageService.uploadImage.mock.calls[0][0]).toBeInstanceOf(File);
     });
 
     it('ImageUploader должен иметь текст "Удалить изображение", когда изображение выбрано, и выводить его через --bg-image', async () => {
-      wrapper.setProps({
-        imageId: mockID,
-      });
-      await wrapper.vm.$nextTick();
+      await wrapper.setProps({ imageId: mockID });
       expect(label.text()).toBe('Удалить изображение');
       expect(
         getComputedStyle(label.element).getPropertyValue('--bg-image'),
@@ -94,18 +96,12 @@ describe('deep-vue/ImageUploader', () => {
     it('ImageUploader должен сбрасывать изображение, при клике на "Удалить изображение"', async () => {
       value = '/fake_path/image.png';
       getFiles.mockReturnValue([new File([], 'image.png')]);
-      wrapper.setProps({
-        imageId: mockID,
-      });
-      await wrapper.vm.$nextTick();
+      await wrapper.setProps({ imageId: mockID });
       await label.trigger('click');
       expect(wrapper.emitted().change).toHaveLength(1);
       expect(wrapper.emitted().change[0]).toEqual([null]);
 
-      wrapper.setProps({
-        imageId: null,
-      });
-      await wrapper.vm.$nextTick();
+      await wrapper.setProps({ imageId: null });
       expect(label.text()).toBe('Загрузить изображение');
       expect(label.attributes().style).toBeFalsy();
       expect(value).toBeFalsy();
