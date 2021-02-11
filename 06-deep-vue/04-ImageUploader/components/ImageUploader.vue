@@ -1,24 +1,88 @@
 <template>
   <div class="image-uploader">
     <label
-      class="image-uploader__preview image-uploader__preview-loading"
-      :style="`--bg-image: url('https://course-vue.javascript.ru/api/images/1')`"
+      class="image-uploader__preview"
+      :class="{ 'image-uploader__preview-loading': loading }"
+      :style="backgroundImage"
+      @click="resetImage($event)"
     >
-      <span>Удалить изображение</span>
+      <span>{{ status }}</span>
       <input
+        ref="input"
         type="file"
         accept="image/*"
         class="form-control-file"
+        :disabled="loading"
+        @change="changeImage"
       />
     </label>
   </div>
 </template>
 
 <script>
-// import { ImageService } from '../image-service';
+import { ImageService } from '../image-service';
 
 export default {
   name: 'ImageUploader',
+
+  data() {
+    return {
+      loading: false,
+    };
+  },
+
+  props: {
+    imageId: {
+      default: null,
+    },
+  },
+
+  model: {
+    prop: 'imageId',
+    event: 'change',
+  },
+
+  computed: {
+    status() {
+      if (!this.loading) {
+        return this.currentImageId !== null
+          ? 'Удалить изображение'
+          : 'Загрузить изображение';
+      } else {
+        return 'Загрузка...';
+      }
+    },
+    currentImageId() {
+      return this.imageId;
+    },
+    backgroundImage() {
+      return this.currentImageId
+        ? `--bg-image: url('${ImageService.getImageURL(this.currentImageId)}')`
+        : null;
+    },
+  },
+
+  methods: {
+    async changeImage() {
+      let imageFile = this.$refs.input.files[0];
+      this.loading = true;
+
+      return this.$emit('change', await this.getNewId(imageFile));
+    },
+    resetImage(event) {
+      if (this.imageId) {
+        event.preventDefault();
+        this.$refs.input.value = '';
+        return this.$emit('change', null);
+      }
+    },
+    async getNewId(value) {
+      return await ImageService.uploadImage(value).then((result) => {
+        this.loading = false;
+        return result.id;
+      });
+    },
+  },
 };
 </script>
 
