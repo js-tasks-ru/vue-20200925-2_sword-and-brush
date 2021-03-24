@@ -3,23 +3,29 @@
     <div class="rangepicker__calendar">
       <div class="rangepicker__month-indicator">
         <div class="rangepicker__selector-controls">
-          <button class="rangepicker__selector-control-left"></button>
-          <div>Январь 2021</div>
-          <button class="rangepicker__selector-control-right"></button>
+          <button
+            @click="previousMonth"
+            class="rangepicker__selector-control-left"
+          ></button>
+          <div>{{ calendarHeader.month }} {{ calendarHeader.year }}</div>
+          <button
+            @click="nextMonth"
+            class="rangepicker__selector-control-right"
+          ></button>
         </div>
       </div>
       <div class="rangepicker__date-grid">
-        <div class="rangepicker__cell rangepicker__cell_inactive">28</div>
-        <div class="rangepicker__cell rangepicker__cell_inactive">29</div>
-        <div class="rangepicker__cell rangepicker__cell_inactive">30</div>
-        <div class="rangepicker__cell rangepicker__cell_inactive">31</div>
-        <div class="rangepicker__cell">
-          1
-          <a class="rangepicker__event">Митап</a>
-          <a class="rangepicker__event">Митап</a>
+        <div
+          v-for="day in currentMonthList"
+          :key="day.dateToString"
+          :class="{
+            rangepicker__cell: true,
+            rangepicker__cell_inactive: day.currentMonth === false,
+          }"
+        >
+          {{ day.currentDate }}
+          <slot :day="day" />
         </div>
-        <div class="rangepicker__cell">2</div>
-        <div class="rangepicker__cell">3</div>
       </div>
     </div>
   </renderless-calendar>
@@ -32,6 +38,85 @@ export default {
   name: 'CalendarView',
 
   components: { RenderlessCalendar },
+
+  props: {
+    customMonth: {
+      type: [Number, Date],
+      default: () => new Date(),
+    },
+  },
+
+  data() {
+    return {
+      month: Number.isFinite(this.customMonth)
+        ? new Date(this.customMonth)
+        : this.customMonth,
+    };
+  },
+
+  watch: {
+    customMonth() {
+      this.month = this.customMonth;
+    },
+  },
+
+  computed: {
+    calendarHeader() {
+      return {
+        month: this.month.toLocaleString(navigator.language, {
+          month: 'long',
+        }),
+        year: this.month.getFullYear(),
+      };
+    },
+
+    currentMonthList() {
+      let currentMonth = [];
+      let firstDay = new Date(this.month.setDate(1));
+
+      let dayOfWeek = new Date(firstDay).setDate(
+        new Date(firstDay).getDate() - (new Date(firstDay).getDay() || 7) + 1,
+      );
+
+      for (let i = 0; i < 42; i++) {
+        let currentDate = new Date(this.month);
+        let currentDay = new Date(dayOfWeek).setDate(
+          new Date(dayOfWeek).getDate() + i,
+        );
+
+        let matchingFirstDay =
+          new Date(
+            currentDate.setMonth(currentDate.getMonth() + 1),
+          ).getMonth() === new Date(currentDay).getMonth() &&
+          new Date(currentDay).getDay() === 1;
+        let matchingLastDay =
+          new Date(currentDay).getMonth() ===
+            new Date(
+              currentDate.setMonth(currentDate.getMonth() + 1),
+            ).getMonth() && new Date(currentDay).getDay() === 0;
+
+        if (matchingFirstDay) break;
+        if (matchingLastDay) break;
+
+        currentMonth.push({
+          currentDate: new Date(currentDay).getDate(),
+          currentMonth:
+            new Date(this.month).getMonth() === new Date(currentDay).getMonth(),
+          dateToString: new Date(currentDay).toDateString(),
+        });
+      }
+      return currentMonth;
+    },
+  },
+
+  methods: {
+    nextMonth() {
+      this.month = new Date(this.month.setMonth(this.month.getMonth() + 1));
+    },
+    previousMonth() {
+      this.month = new Date(this.month.setMonth(this.month.getMonth() - 1));
+    },
+  },
 };
 </script>
 
