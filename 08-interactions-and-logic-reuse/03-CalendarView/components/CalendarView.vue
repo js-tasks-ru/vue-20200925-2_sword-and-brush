@@ -55,20 +55,9 @@ export default {
       let currentMonth = [];
       let firstDay = new Date(this.currentDate.setDate(1));
 
-      let dayOfWeek =
-        new Date(firstDay).getDay() === 2
-          ? new Date(firstDay).setDate(new Date(firstDay).getDate() - 1)
-          : new Date(firstDay).getDay() === 3
-          ? new Date(firstDay).setDate(new Date(firstDay).getDate() - 2)
-          : new Date(firstDay).getDay() === 4
-          ? new Date(firstDay).setDate(new Date(firstDay).getDate() - 3)
-          : new Date(firstDay).getDay() === 5
-          ? new Date(firstDay).setDate(new Date(firstDay).getDate() - 4)
-          : new Date(firstDay).getDay() === 6
-          ? new Date(firstDay).setDate(new Date(firstDay).getDate() - 5)
-          : new Date(firstDay).getDay() === 0
-          ? new Date(firstDay).setDate(new Date(firstDay).getDate() - 6)
-          : firstDay;
+      let dayOfWeek = new Date(firstDay).setDate(
+        new Date(firstDay).getDate() - (new Date(firstDay).getDay() || 7) + 1,
+      );
 
       for (let i = 0; i < 42; i++) {
         let currentDate = new Date(this.currentDate);

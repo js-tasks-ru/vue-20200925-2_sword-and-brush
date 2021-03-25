@@ -15,8 +15,8 @@
       :to="{ name: 'meetup', params: { meetupId: meetup.id } }"
       class="rangepicker__event"
     >
-      {{ meetup.title }} </router-link
-    >`
+      {{ meetup.title }}
+    </router-link>
   </calendar-view>
 </template>
 
