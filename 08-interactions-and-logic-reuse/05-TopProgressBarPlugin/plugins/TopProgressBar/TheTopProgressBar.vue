@@ -1,10 +1,109 @@
 <template>
-  <div class="progress" style="width: 0%"></div>
+  <div
+    class="progress"
+    :class="{ show: progressLine, failed: progressFail }"
+    :style="{ width: loadingValue }"
+  ></div>
 </template>
 
 <script>
 export default {
   name: 'TheTopProgressBar',
+
+  data() {
+    return {
+      progressLine: false,
+      progressFail: false,
+      loadingValue: 0,
+      animationProcess: false,
+      animationProcessFinish: false,
+    };
+  },
+
+  methods: {
+    start() {
+      this.progressLine = true;
+      if (!this.animationProcess) {
+        this.animationProcess = true;
+        this.loadingAnimation(10000);
+      }
+    },
+
+    finish() {
+      if (!this.animationProcessFinish) {
+        this.completionAnimation(1000);
+      }
+    },
+
+    fail() {
+      this.progressFail = true;
+      if (!this.animationProcessFinish) {
+        this.completionAnimation(1000);
+      }
+    },
+
+    loadingAnimation(duration) {
+      this.loadingValue = 0;
+      this.animationProcess = true;
+      let start = performance.now();
+      let animationProgress = 0;
+
+      let step = (time) => {
+        animationProgress += ((time - start) / duration) * 100;
+        this.loadingValue = animationProgress + '%';
+        start = time;
+        if (
+          parseFloat(this.loadingValue) < 100 &&
+          !this.animationProcessFinish &&
+          !this.progressFail
+        ) {
+          requestAnimationFrame(step);
+        }
+      };
+      requestAnimationFrame(step);
+    },
+
+    completionAnimation(duration) {
+      this.animationProcessFinish = true;
+      let start = performance.now();
+      let completedAnimation = parseFloat(this.loadingValue);
+      let animationProgress = parseFloat(this.loadingValue);
+
+      let step = (time) => {
+        let progressFraction = ((time - start) / duration) * 100;
+        animationProgress +=
+          progressFraction - (progressFraction / 100) * completedAnimation;
+        this.loadingValue = animationProgress + '%';
+        start = time;
+        if (parseFloat(this.loadingValue) >= 100) {
+          this.hideProgressLine(200);
+        }
+        if (parseFloat(this.loadingValue) < 100) {
+          requestAnimationFrame(step);
+        }
+      };
+      requestAnimationFrame(step);
+    },
+
+    hideProgressLine(duration) {
+      if (!this.progressFail) {
+        setTimeout(() => {
+          this.progressLine = false;
+          this.animationProcess = false;
+          this.animationProcessFinish = false;
+        }, duration);
+      } else {
+        setTimeout(() => {
+          this.progressLine = false;
+        }, duration);
+        setTimeout(() => {
+          this.progressFail = false;
+          this.animationProcess = false;
+          this.animationProcessFinish = false;
+        }, duration + 300);
+      }
+    },
+  },
 };
 </script>
 
